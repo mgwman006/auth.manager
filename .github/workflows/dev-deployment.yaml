@@ -58,7 +58,7 @@ jobs:
           sudo docker rm auth-manager || true
 
           echo "Loading new image..."
-          sudo gunzip -c auth-manager.tar.gz | docker load
+          gunzip -c auth-manager.tar.gz | sudo docker load
 
           echo "Starting new container..."
           sudo docker run -d \
