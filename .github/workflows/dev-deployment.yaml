@@ -1,0 +1,78 @@
+name: Deploy Auth Manager to Dev Environment
+
+on:
+  push:
+    branches:
+      - dev
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: DEV
+
+    env:
+      DB_URL: ${{ secrets.TANTE_DB_URL }}
+      DB_USERNAME: ${{ secrets.AUTH_MANAGER_DB_USERNAME}}
+      DB_PASSWORD: ${{ secrets.AUTH_MANAGER_DB_PASSWORD }}
+      SERVER_PORT: 8080
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Docker Build
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Docker (local build only)
+        run: echo "Building Docker image..."
+
+      - name: Build Docker image
+        run: docker build -t auth-manager:dev .
+
+      - name: Save Docker image as tar
+        run: docker save auth-manager:dev | gzip > auth-manager.tar.gz
+
+      - name: Copy image to EC2
+        uses: appleboy/scp-action@v1
+        with:
+          host: ${{ secrets.TANTE_MAIN_SERVER_EC2_HOST_NAME }}
+          username: ${{ secrets.TANTE_MAIN_SERVER_EC2_USER }}
+          key: ${{ secrets.TANTE_MAIN_SERVER_EC2_SECRETE_KEY }}
+          source: "auth-manager.tar.gz"
+          target: "/home/ubuntu/auth-manager"
+
+      - name: Deploy on EC2
+        run: |
+          echo "${{ secrets.TANTE_MAIN_SERVER_EC2_SECRETE_KEY }}" > private_key
+          chmod 600 private_key
+
+          ssh -o StrictHostKeyChecking=no -i private_key \
+          ${{ secrets.TANTE_MAIN_SERVER_EC2_USER }}@${{ secrets.TANTE_MAIN_SERVER_EC2_HOST_NAME }} << EOF
+
+          set -e
+
+          cd /home/ubuntu/auth-manager
+
+          echo "Stopping old container..."
+          docker stop auth-manager || true
+          docker rm auth-manager || true
+
+          echo "Loading new image..."
+          gunzip -c auth-manager.tar.gz | docker load
+
+          echo "Starting new container..."
+          docker run -d \
+            --name auth-manager \
+            --restart always \
+            -p ${SERVER_PORT}:${SERVER_PORT} \
+            -e DB_URL="${DB_URL}" \
+            -e DB_USERNAME="${DB_USERNAME}" \
+            -e DB_PASSWORD="${DB_PASSWORD}" \
+            -e SERVER_PORT="${SERVER_PORT}" \
+            auth-manager:dev
+
+          echo "Deployment complete"
+
+          EOF
+
+          rm private_key
