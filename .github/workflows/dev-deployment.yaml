@@ -47,7 +47,11 @@ jobs:
           chmod 600 private_key
 
           ssh -o StrictHostKeyChecking=no -i private_key \
-          ${{ secrets.TANTE_MAIN_SERVER_EC2_USER }}@${{ secrets.TANTE_MAIN_SERVER_EC2_HOST_NAME }} << EOF
+          ${{ secrets.TANTE_MAIN_SERVER_EC2_USER }}@${{ secrets.TANTE_MAIN_SERVER_EC2_HOST_NAME }} \
+          "DB_URL='${{ secrets.TANTE_DB_URL }}' \
+           DB_USERNAME='${{ secrets.AUTH_MANAGER_DB_USERNAME }}' \
+           DB_PASSWORD='${{ secrets.AUTH_MANAGER_DB_PASSWORD }}' \
+           SERVER_PORT=8080 bash -s" << 'EOF'
 
           set -e
 
@@ -70,8 +74,6 @@ jobs:
             -e DB_PASSWORD="$DB_PASSWORD" \
             -e SERVER_PORT="$SERVER_PORT" \
             auth-manager:dev
-
-          echo "Deployment complete"
 
           EOF
 
