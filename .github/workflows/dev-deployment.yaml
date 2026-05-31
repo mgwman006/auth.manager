@@ -27,7 +27,7 @@ jobs:
         run: echo "Building Docker image..."
 
       - name: Build Docker image
-        run: docker build -t auth-manager:dev .
+        run: docker buildx build --platform linux/arm64 -t auth-manager:dev --load .
 
       - name: Save Docker image as tar
         run: docker save auth-manager:dev | gzip > auth-manager.tar.gz
@@ -64,11 +64,11 @@ jobs:
           sudo docker run -d \
             --name auth-manager \
             --restart always \
-            -p ${SERVER_PORT}:${SERVER_PORT} \
-            -e DB_URL="${DB_URL}" \
-            -e DB_USERNAME="${DB_USERNAME}" \
-            -e DB_PASSWORD="${DB_PASSWORD}" \
-            -e SERVER_PORT="${SERVER_PORT}" \
+            -p 8080:8080 \
+            -e DB_URL="$DB_URL" \
+            -e DB_USERNAME="$DB_USERNAME" \
+            -e DB_PASSWORD="$DB_PASSWORD" \
+            -e SERVER_PORT="$SERVER_PORT" \
             auth-manager:dev
 
           echo "Deployment complete"
