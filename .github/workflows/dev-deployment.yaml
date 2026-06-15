@@ -11,10 +11,10 @@ jobs:
     environment: DEV
 
     env:
-      DB_URL: ${{ secrets.TANTE_DB_URL }}
+      DB_URL: ${{ secrets.TANTE_MAIN_DB_URL }}
       DB_USERNAME: ${{ secrets.AUTH_MANAGER_DB_USERNAME}}
       DB_PASSWORD: ${{ secrets.AUTH_MANAGER_DB_PASSWORD }}
-      SERVER_PORT: 8080
+      SERVER_PORT: 8081
 
     steps:
       - name: Checkout code
@@ -27,7 +27,7 @@ jobs:
         run: echo "Building Docker image..."
 
       - name: Build Docker image
-        run: docker buildx build --platform linux/arm64 -t auth-manager:dev --load .
+        run: docker buildx build --platform linux/amd64 -t auth-manager:dev --load .
 
       - name: Save Docker image as tar
         run: docker save auth-manager:dev | gzip > auth-manager.tar.gz
@@ -48,10 +48,7 @@ jobs:
 
           ssh -o StrictHostKeyChecking=no -i private_key \
           ${{ secrets.TANTE_MAIN_SERVER_EC2_USER }}@${{ secrets.TANTE_MAIN_SERVER_EC2_HOST_NAME }} \
-          "DB_URL='${{ secrets.TANTE_DB_URL }}' \
-           DB_USERNAME='${{ secrets.AUTH_MANAGER_DB_USERNAME }}' \
-           DB_PASSWORD='${{ secrets.AUTH_MANAGER_DB_PASSWORD }}' \
-           SERVER_PORT=8080 bash -s" << 'EOF'
+           "bash -s" << 'EOF'
 
           set -e
 
@@ -68,11 +65,10 @@ jobs:
           sudo docker run -d \
             --name auth-manager \
             --restart always \
-            -p 8080:8080 \
+            -p 8081:8081 \
             -e DB_URL="$DB_URL" \
             -e DB_USERNAME="$DB_USERNAME" \
             -e DB_PASSWORD="$DB_PASSWORD" \
-            -e SERVER_PORT="$SERVER_PORT" \
             auth-manager:dev
 
           EOF
