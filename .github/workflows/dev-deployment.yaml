@@ -48,7 +48,10 @@ jobs:
 
           ssh -o StrictHostKeyChecking=no -i private_key \
           ${{ secrets.TANTE_MAIN_SERVER_EC2_USER }}@${{ secrets.TANTE_MAIN_SERVER_EC2_HOST_NAME }} \
-           "bash -s" << 'EOF'
+          "DB_URL='${{ secrets.TANTE_MAIN_DB_URL }}' \
+           DB_USERNAME='${{ secrets.AUTH_MANAGER_DB_USERNAME }}' \
+           DB_PASSWORD='${{ secrets.AUTH_MANAGER_DB_PASSWORD }}' \
+           bash -s" << 'EOF'
 
           set -e
 
