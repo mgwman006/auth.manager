@@ -29,6 +29,6 @@ public class OpenApiConfig {
   @Bean
   public OpenAPI customOpenAPI() {
     return new OpenAPI()
-      .addServersItem(new Server().url("https://api.auth.tante.tz"));
+      .addServersItem(new Server().url("https://api.auth.tante.tz/auth-manager"));
   }
 }
