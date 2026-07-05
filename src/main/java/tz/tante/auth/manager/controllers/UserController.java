@@ -13,7 +13,7 @@ import java.net.URI;
 
 @AllArgsConstructor
 @RestController
-@RequestMapping("/v1/users")
+@RequestMapping("/auth-manager/v1/users")
 public class UserController {
 
     private final UserService userService;
