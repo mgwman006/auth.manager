@@ -18,7 +18,7 @@ import tz.tante.auth.manager.services.AuthService;
 @Validated
 @AllArgsConstructor
 @RestController
-@RequestMapping("/v1/auth")
+@RequestMapping("/auth-manager/v1/auth")
 public class AuthController
 {
   private final AuthService authService;
