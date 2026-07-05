@@ -37,13 +37,13 @@ public class SecurityFilterChainConfig
       )
       .authorizeHttpRequests(auth -> auth
         .requestMatchers(
-          "/auth-manager/v1/auth/**",
+          "/v1/auth/**",
           "/swagger-ui/**",
           "/swagger-ui.html",
           "/v3/api-docs/**"
         ).permitAll()
-        .requestMatchers(HttpMethod.POST, "/auth-manager/v1/users/**").permitAll()
-        .requestMatchers(HttpMethod.GET, "/auth-manager/v1/users/**").permitAll()
+        .requestMatchers(HttpMethod.POST, "/v1/users/**").permitAll()
+        .requestMatchers(HttpMethod.GET, "/v1/users/**").permitAll()
         .anyRequest().authenticated()
       );
 

@@ -14,7 +14,7 @@ import tz.tante.auth.manager.services.OrganisationService;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/auth-manager/v1/organisations")
+@RequestMapping("/v1/organisations")
 public class OrganizationController
 {
   private final OrganisationService organisationService;
