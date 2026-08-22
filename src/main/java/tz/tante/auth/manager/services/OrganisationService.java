@@ -4,7 +4,7 @@ package tz.tante.auth.manager.services;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
-import tz.tante.auth.manager.enums.MembershipRole;
+import tz.tante.auth.manager.enums.OrganizationMembershipRole;
 import tz.tante.auth.manager.exceptions.ResourceExistException;
 import tz.tante.auth.manager.exceptions.TanteException;
 import tz.tante.auth.manager.models.dtos.common.AddressDTO;
@@ -52,7 +52,7 @@ public class OrganisationService
       organization = organizationRepository.save(organization);
 
       Membership membership = new Membership();
-      membership.setMembershipRole(MembershipRole.OWNER);
+      membership.setOrganizationMembershipRole(OrganizationMembershipRole.OWNER);
 
       organization.addMembership(membership);
       user.addMembership(membership);
