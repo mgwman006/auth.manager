@@ -3,7 +3,7 @@ package tz.tante.auth.manager.models.entities;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-import tz.tante.auth.manager.enums.MembershipRole;
+import tz.tante.auth.manager.enums.OrganizationMembershipRole;
 
 @Getter
 @Setter
@@ -20,7 +20,7 @@ public class Membership extends BaseEntity
   private Organization organization;
 
   @Enumerated(EnumType.STRING)
-  private MembershipRole membershipRole;
+  private OrganizationMembershipRole organizationMembershipRole;
 
   private boolean active = true;
 }

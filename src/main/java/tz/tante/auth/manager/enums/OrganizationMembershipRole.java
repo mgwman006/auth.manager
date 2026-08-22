@@ -1,6 +1,6 @@
 package tz.tante.auth.manager.enums;
 
-public enum MembershipRole
+public enum OrganizationMembershipRole
 {
   OWNER,
   ADMIN,
