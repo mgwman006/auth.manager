@@ -32,7 +32,7 @@ public class MembershipService
       membership.getUser().getId(),
       membership.getOrganization().getId(),
       membership.getOrganization().getName(),
-      membership.getMembershipRole()
+      membership.getOrganizationMembershipRole()
     );
   }
 }
