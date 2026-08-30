@@ -40,7 +40,8 @@ public class SecurityFilterChainConfig
           "/v1/auth/**",
           "/swagger-ui/**",
           "/swagger-ui.html",
-          "/v3/api-docs/**"
+          "/v3/api-docs/**",
+          "/swagger-ui/index.html"
         ).permitAll()
         .requestMatchers(HttpMethod.POST, "/v1/users/**").permitAll()
         .requestMatchers(HttpMethod.GET, "/v1/users/**").permitAll()
