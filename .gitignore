@@ -1,0 +1,28 @@
+# Maven / Java build output
+/target/
+/out/
+
+# Logs
+*.log
+logs/
+
+# OS files
+.DS_Store
+
+# IDE files
+.idea/
+*.iml
+.vscode/
+
+# Environment and local overrides
+.env
+.env.*
+*.local
+
+# Temporary files
+*.tmp
+*.swp
+
+# Security-sensitive local files
+*.pem
+
