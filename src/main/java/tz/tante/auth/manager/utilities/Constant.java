@@ -3,7 +3,7 @@ package tz.tante.auth.manager.utilities;
 public class Constant
 {
   public static final String jwtSecret = "lets-explore-tanzania-secret-key";
-  public static final long jwtExpirationMs = 86400000;// 1 day
+  public static final long jwtExpirationMs = 604800000;// 7 days
   public static String INTERNAL_SERVER_ERROR_MESSAGE = "INTERNAL_SERVER_ERROR";
   public static String BAD_REQUEST_MESSAGE = "BAD_REQUEST";
   public static String VALIDATION_FAILED_MESSAGE = "VALIDATION_FAILED";
