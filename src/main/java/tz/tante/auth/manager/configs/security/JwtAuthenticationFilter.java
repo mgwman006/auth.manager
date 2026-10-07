@@ -35,37 +35,36 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter
   {
     try
     {
-      logger.info("It is here");
       String authHeader = request.getHeader("Authorization");
-      logger.info("Authorization header: " + authHeader);
       if (authHeader != null && authHeader.startsWith("Bearer "))
       {
         String token = authHeader.substring(7);
-        logger.info("Received JWT token: " + token);
-        if (jwtUtils.validateToken(token))
-        {
-          String phoneNumber = jwtUtils.getUserName(token);
-          List<SimpleGrantedAuthority> roles = jwtUtils.getRolesFromToken(token)
-            .stream()
-            .map(SimpleGrantedAuthority::new)
-            .toList();
+        String phoneNumber = jwtUtils.getUserName(token);
+        List<SimpleGrantedAuthority> roles = jwtUtils.getRolesFromToken(token)
+          .stream()
+          .map(SimpleGrantedAuthority::new)
+          .toList();
 
-          var authToken = new UsernamePasswordAuthenticationToken(phoneNumber, null, roles);
-          authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-          SecurityContextHolder.getContext().setAuthentication(authToken);
-        }
+        var authToken = new UsernamePasswordAuthenticationToken(phoneNumber, null, roles);
+        authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+        SecurityContextHolder.getContext().setAuthentication(authToken);
       }
 
       filterChain.doFilter(request, response);
     }
     catch (Exception exception)
     {
-      authenticationEntryPoint.commence(
-        request,
-        response,
-        new BadCredentialsException(exception.getMessage(),exception)
-      );
+      authenticationEntryPoint.commence(request, response, new BadCredentialsException(exception.getMessage(),exception));
     }
 
+  }
+
+  @Override
+  protected boolean shouldNotFilter(HttpServletRequest request)
+  {
+    String path = request.getRequestURI();
+    return path.startsWith("/v1/auth")
+      || path.startsWith("/swagger-ui")
+      || path.startsWith("/v3/api-docs");
   }
 }
