@@ -24,9 +24,9 @@ public class GlobalConfigs
     return new BCryptPasswordEncoder();
   }
 
-  @Bean
-  public CompromisedPasswordChecker compromisedPasswordChecker() {
-    return new HaveIBeenPwnedRestApiPasswordChecker();
-  }
+//  @Bean
+//  public CompromisedPasswordChecker compromisedPasswordChecker() {
+//    return new HaveIBeenPwnedRestApiPasswordChecker();
+//  }
 
 }
