@@ -4,7 +4,6 @@ package tz.tante.auth.manager.utilities;
 import java.time.Instant;
 import java.util.Set;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
@@ -14,16 +13,21 @@ import org.springframework.stereotype.Component;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 
 @Component
-@RequiredArgsConstructor
 public class JwtUtils {
 
-  @Value("${app.url}")
-  private String appUrl;
-
+  private final String appUrl;
   private final JwtEncoder jwtEncoder;
   private final JwtDecoder jwtDecoder;
 
-  public String generateToken(String username, Set<String> roles) {
+  public JwtUtils(JwtEncoder jwtEncoder, JwtDecoder jwtDecoder,@Value("${app.url}") String appUrl)
+  {
+    this.jwtEncoder = jwtEncoder;
+    this.jwtDecoder = jwtDecoder;
+    this.appUrl = appUrl;
+  }
+
+  public String generateToken(String username, Set<String> roles)
+  {
     Instant now = Instant.now();
 
     JwtClaimsSet claims = JwtClaimsSet.builder()
@@ -37,20 +41,13 @@ public class JwtUtils {
     return jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
   }
 
-  public boolean validateToken(String token) {
-    try {
-      getClaims(token);
-      return true;
-    } catch (Exception exception) {
-      return false;
-    }
-  }
-
-  public String getUserName(String token) {
+  public String getUserName(String token)
+  {
     return getClaims(token).getSubject();
   }
 
-  public Set<String> getRolesFromToken(String token) {
+  public Set<String> getRolesFromToken(String token)
+  {
     Object roles = getClaims(token).getClaims().get("roles");
 
     if (!(roles instanceof java.util.Collection<?> values)) {
