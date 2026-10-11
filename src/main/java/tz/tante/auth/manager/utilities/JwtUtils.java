@@ -5,6 +5,7 @@ import java.time.Instant;
 import java.util.Set;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
@@ -16,7 +17,8 @@ import org.springframework.security.oauth2.jwt.JwtDecoder;
 @RequiredArgsConstructor
 public class JwtUtils {
 
-  private static final String ISSUER = "http://localhost:8081";
+  @Value("${app.url}")
+  private String appUrl;
 
   private final JwtEncoder jwtEncoder;
   private final JwtDecoder jwtDecoder;
@@ -25,7 +27,7 @@ public class JwtUtils {
     Instant now = Instant.now();
 
     JwtClaimsSet claims = JwtClaimsSet.builder()
-      .issuer(ISSUER)
+      .issuer(appUrl)
       .subject(username)
       .issuedAt(now)
       .expiresAt(now.plusMillis(Constant.jwtExpirationMs))

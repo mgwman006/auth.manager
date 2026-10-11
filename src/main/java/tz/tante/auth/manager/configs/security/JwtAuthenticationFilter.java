@@ -28,42 +28,63 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter
   }
 
 
+
   @Override
-  protected void doFilterInternal(@NonNull HttpServletRequest request,
-                                  @NonNull HttpServletResponse response,
-                                  @NonNull FilterChain filterChain) throws IOException
-  {
-    try
-    {
-      String authHeader = request.getHeader("Authorization");
-      if (authHeader != null && authHeader.startsWith("Bearer "))
-      {
+  protected void doFilterInternal(
+    @NonNull HttpServletRequest request,
+    @NonNull HttpServletResponse response,
+    @NonNull FilterChain filterChain
+  ) throws IOException, jakarta.servlet.ServletException {
+
+    String authHeader = request.getHeader("Authorization");
+
+    if (authHeader != null && authHeader.startsWith("Bearer ")) {
+      try {
         String token = authHeader.substring(7);
         String phoneNumber = jwtUtils.getUserName(token);
-        List<SimpleGrantedAuthority> roles = jwtUtils.getRolesFromToken(token)
-          .stream()
-          .map(SimpleGrantedAuthority::new)
-          .toList();
 
-        var authToken = new UsernamePasswordAuthenticationToken(phoneNumber, null, roles);
-        authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-        SecurityContextHolder.getContext().setAuthentication(authToken);
+        List<SimpleGrantedAuthority> roles =
+          jwtUtils.getRolesFromToken(token)
+            .stream()
+            .map(SimpleGrantedAuthority::new)
+            .toList();
+
+        var authToken =
+          new UsernamePasswordAuthenticationToken(
+            phoneNumber, null, roles
+          );
+
+        authToken.setDetails(
+          new WebAuthenticationDetailsSource()
+            .buildDetails(request)
+        );
+
+        SecurityContextHolder.getContext()
+          .setAuthentication(authToken);
+
+      } catch (Exception exception) {
+        SecurityContextHolder.clearContext();
+
+        authenticationEntryPoint.commence(
+          request,
+          response,
+          new BadCredentialsException(
+            "Invalid authentication token", exception
+          )
+        );
+        return;
       }
-
-      filterChain.doFilter(request, response);
-    }
-    catch (Exception exception)
-    {
-      authenticationEntryPoint.commence(request, response, new BadCredentialsException(exception.getMessage(),exception));
     }
 
+    filterChain.doFilter(request, response);
   }
 
   @Override
   protected boolean shouldNotFilter(HttpServletRequest request)
   {
-    String path = request.getRequestURI();
-    return path.startsWith("/v1/auth")
+    String path = request.getServletPath();
+    return request.getMethod().equalsIgnoreCase("OPTIONS")
+      || path.startsWith("/v1/auth")
       || path.startsWith("/swagger-ui")
       || path.startsWith("/v3/api-docs");
   }
