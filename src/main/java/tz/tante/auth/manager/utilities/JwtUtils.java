@@ -1,58 +1,67 @@
+
 package tz.tante.auth.manager.utilities;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.security.Keys;
-import org.springframework.stereotype.Component;
-import java.nio.charset.StandardCharsets;
-import java.security.Key;
-import java.util.Date;
-import java.util.HashSet;
+import java.time.Instant;
 import java.util.Set;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.jwt.JwtClaimsSet;
+import org.springframework.security.oauth2.jwt.JwtEncoder;
+import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
+import org.springframework.stereotype.Component;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
 
 @Component
 public class JwtUtils {
 
-  private final Key key = Keys.hmacShaKeyFor(Constant.jwtSecret.getBytes(StandardCharsets.UTF_8));
+  private final String appUrl;
+  private final JwtEncoder jwtEncoder;
+  private final JwtDecoder jwtDecoder;
 
-  public String generateToken(String username, Set<String> roles) {
-    return Jwts.builder()
-      .setSubject(username)
-      .setIssuer("tz.tante.auth")
-      .setIssuedAt(new Date())
-      .setExpiration(new Date(System.currentTimeMillis() + Constant.jwtExpirationMs))
-      .signWith(key)
-      .compact();
+  public JwtUtils(JwtEncoder jwtEncoder, JwtDecoder jwtDecoder,@Value("${app.url}") String appUrl)
+  {
+    this.jwtEncoder = jwtEncoder;
+    this.jwtDecoder = jwtDecoder;
+    this.appUrl = appUrl;
   }
 
-  private Claims getClaims(String token) {
-    return Jwts.parserBuilder()
-      .setSigningKey(key)
-      .build()
-      .parseClaimsJws(token)
-      .getBody();
+  public String generateToken(String username, Set<String> roles)
+  {
+    Instant now = Instant.now();
+
+    JwtClaimsSet claims = JwtClaimsSet.builder()
+      .issuer(appUrl)
+      .subject(username)
+      .issuedAt(now)
+      .expiresAt(now.plusMillis(Constant.jwtExpirationMs))
+      .claim("roles", roles)
+      .build();
+
+    return jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
   }
 
-  public boolean validateToken(String token) {
-    try {
-      getClaims(token);
-      return true;
-    } catch (Exception e) {
-      return false;
-    }
-  }
-
-  public String getUserName(String token) {
+  public String getUserName(String token)
+  {
     return getClaims(token).getSubject();
   }
 
-  @SuppressWarnings("unchecked")
-  public Set<String> getRolesFromToken(String token) {
-    Claims claims = getClaims(token);
-    Object roles = claims.get("roles");
-    if (roles == null) {
-      return new HashSet<>();
+  public Set<String> getRolesFromToken(String token)
+  {
+    Object roles = getClaims(token).getClaims().get("roles");
+
+    if (!(roles instanceof java.util.Collection<?> values)) {
+      return Set.of();
     }
-    return new HashSet<>(((java.util.List<String>) claims.get("roles")));
+
+    return values.stream()
+      .filter(String.class::isInstance)
+      .map(String.class::cast)
+      .collect(java.util.stream.Collectors.toSet());
+  }
+
+  private Jwt getClaims(String token)
+  {
+    return jwtDecoder.decode(token);
   }
 }

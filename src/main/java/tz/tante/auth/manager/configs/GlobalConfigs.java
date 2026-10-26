@@ -4,9 +4,11 @@ package tz.tante.auth.manager.configs;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.password.CompromisedPasswordChecker;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.password.HaveIBeenPwnedRestApiPasswordChecker;
 
 @Configuration
 public class GlobalConfigs
@@ -21,5 +23,10 @@ public class GlobalConfigs
   public PasswordEncoder passwordEncoder() {
     return new BCryptPasswordEncoder();
   }
+
+//  @Bean
+//  public CompromisedPasswordChecker compromisedPasswordChecker() {
+//    return new HaveIBeenPwnedRestApiPasswordChecker();
+//  }
 
 }
