@@ -3,6 +3,7 @@ package tz.tante.auth.manager.configs.security;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -26,9 +27,15 @@ public class SecurityFilterChainConfig
 
 
   @Bean
+  @Order(3)
   public SecurityFilterChain filterChain(HttpSecurity http) throws Exception
   {
     http
+      .securityMatcher(
+        "/v1/**",
+        "/swagger-ui/**",
+        "/v3/api-docs/**"
+      )
       .csrf(AbstractHttpConfigurer::disable)
       .cors(Customizer.withDefaults())
       .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

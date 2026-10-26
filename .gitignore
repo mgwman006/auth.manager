@@ -1,6 +1,9 @@
 # Maven / Java build output
 /target/
 /out/
+./target/*
+./target/
+/target/*
 
 # Logs
 *.log
