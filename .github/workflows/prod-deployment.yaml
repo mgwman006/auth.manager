@@ -11,10 +11,10 @@ jobs:
     environment: PROD
 
     env:
-      DB_URL: ${{ secrets.TANTE_CORE_DB_URL }}
+      DB_URL: ${{ secrets.DB_URL }}
       DB_USERNAME: ${{ secrets.AUTH_MANAGER_DB_USERNAME}}
       DB_PASSWORD: ${{ secrets.AUTH_MANAGER_DB_PASSWORD }}
-      APP_URL: ${{ secrets.APP_URL }}
+      APP_URL: ${{ secrets.AUTH_MANAGER_APP_URL }}
       SERVER_PORT: 8081
 
     steps:
@@ -36,23 +36,23 @@ jobs:
       - name: Copy image to EC2
         uses: appleboy/scp-action@v1
         with:
-          host: ${{ secrets.TANTE_MAIN_SERVER_EC2_HOST_NAME }}
-          username: ${{ secrets.TANTE_MAIN_SERVER_EC2_USER }}
-          key: ${{ secrets.TANTE_MAIN_SERVER_EC2_SECRETE_KEY }}
+          host: ${{ secrets.AUTH_SERVER_HOST_IP }}
+          username: ${{ secrets.AUTH_SERVER_USER }}
+          key: ${{ secrets.AUTH_SERVER_SECRETE_KEY }}
           source: "auth-manager.tar.gz"
           target: "/home/ubuntu/auth-manager"
 
       - name: Deploy on EC2
         run: |
-          echo "${{ secrets.TANTE_MAIN_SERVER_EC2_SECRETE_KEY }}" > private_key
+          echo "${{ secrets.AUTH_SERVER_SECRETE_KEY }}" > private_key
           chmod 600 private_key
 
           ssh -o StrictHostKeyChecking=no -i private_key \
-          ${{ secrets.TANTE_MAIN_SERVER_EC2_USER }}@${{ secrets.TANTE_MAIN_SERVER_EC2_HOST_NAME }} \
-          "DB_URL='${{ secrets.TANTE_CORE_DB_URL }}' \
+          ${{ secrets.AUTH_SERVER_USER }}@${{ secrets.AUTH_SERVER_HOST_IP }} \
+          "DB_URL='${{ secrets.DB_URL }}' \
            DB_USERNAME='${{ secrets.AUTH_MANAGER_DB_USERNAME }}' \
            DB_PASSWORD='${{ secrets.AUTH_MANAGER_DB_PASSWORD }}' \
-           APP_URL='${{ secrets.APP_URL }}' \
+           APP_URL='${{ secrets.AUTH_SERVER_APP_URL }}' \
            bash -s" << 'EOF'
 
           set -e
