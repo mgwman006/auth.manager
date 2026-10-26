@@ -102,7 +102,6 @@ public class AuthService
     }
     catch (Exception exception)
     {
-      exception.printStackTrace(); // temporary local debugging
       throw new AuthException(exception.getMessage());
     }
   }

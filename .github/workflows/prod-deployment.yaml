@@ -11,7 +11,7 @@ jobs:
     environment: PROD
 
     env:
-      DB_URL: ${{ secrets.TANTE_MAIN_DB_URL }}
+      DB_URL: ${{ secrets.TANTE_CORE_DB_URL }}
       DB_USERNAME: ${{ secrets.AUTH_MANAGER_DB_USERNAME}}
       DB_PASSWORD: ${{ secrets.AUTH_MANAGER_DB_PASSWORD }}
       APP_URL: ${{ secrets.APP_URL }}
@@ -28,10 +28,10 @@ jobs:
         run: echo "Building Docker image..."
 
       - name: Build Docker image
-        run: docker buildx build --platform linux/amd64 -t auth-manager:dev --load .
+        run: docker buildx build --platform linux/amd64 -t auth-manager:prod --load .
 
       - name: Save Docker image as tar
-        run: docker save auth-manager:dev | gzip > auth-manager.tar.gz
+        run: docker save auth-manager:prod | gzip > auth-manager.tar.gz
 
       - name: Copy image to EC2
         uses: appleboy/scp-action@v1
@@ -49,7 +49,7 @@ jobs:
 
           ssh -o StrictHostKeyChecking=no -i private_key \
           ${{ secrets.TANTE_MAIN_SERVER_EC2_USER }}@${{ secrets.TANTE_MAIN_SERVER_EC2_HOST_NAME }} \
-          "DB_URL='${{ secrets.TANTE_MAIN_DB_URL }}' \
+          "DB_URL='${{ secrets.TANTE_CORE_DB_URL }}' \
            DB_USERNAME='${{ secrets.AUTH_MANAGER_DB_USERNAME }}' \
            DB_PASSWORD='${{ secrets.AUTH_MANAGER_DB_PASSWORD }}' \
            APP_URL='${{ secrets.APP_URL }}' \
@@ -75,7 +75,7 @@ jobs:
             -e DB_USERNAME="$DB_USERNAME" \
             -e DB_PASSWORD="$DB_PASSWORD" \
             -e APP_URL="$APP_URL" \
-            auth-manager:dev
+            auth-manager:prod
 
           EOF
 
