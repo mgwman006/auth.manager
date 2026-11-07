@@ -34,12 +34,15 @@ public class OrganisationService
       User user = userRepository.findById(ownerId)
         .orElseThrow( () -> new ResourceExistException("User with id " + ownerId + " not found."));
 
+      AddressDTO addressDTO = request.address();
       Address address = new Address(
-        request.address().street(),
-        request.address().area(),
-        request.address().city(),
-        request.address().region(),
-        request.address().country()
+        addressDTO.postalCode(),
+        addressDTO.streetNumber(),
+        addressDTO.streetName(),
+        addressDTO.ward(),
+        addressDTO.city(),
+        addressDTO.region(),
+        addressDTO.country()
       );
 
       Organization organization = new Organization(
@@ -59,16 +62,20 @@ public class OrganisationService
 
       membershipRepository.save(membership);
 
+      address = organization.getAddress();
+
       return new OrganizationDetailsDTO(
         organization.getId(),
         organization.getName(),
         organization.getBusinessEmail(),
         new AddressDTO(
-          organization.getAddress().getStreet(),
-          organization.getAddress().getArea(),
-          organization.getAddress().getCity(),
-          organization.getAddress().getRegion(),
-          organization.getAddress().getCountry()
+          address.getPostalCode(),
+          address.getStreetNumber(),
+          address.getStreetName(),
+          address.getWard(),
+          address.getCity(),
+          address.getRegion(),
+          address.getCountry()
         ),
         organization.getType()
       );
