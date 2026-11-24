@@ -21,10 +21,7 @@ public class OrganizationController
 
   @Operation(security = @SecurityRequirement(name = "bearerAuth"))
   @PostMapping("/{ownerId}")
-  public ResponseEntity<ApiResponse<OrganizationDetailsDTO>> createOrganization(
-    @PathVariable Long ownerId,
-    @Valid @RequestBody OrganizationCreateDTO request
-  )
+  public ResponseEntity<ApiResponse<OrganizationDetailsDTO>> createOrganization(@PathVariable Long ownerId, @Valid @RequestBody OrganizationCreateDTO request)
   {
     OrganizationDetailsDTO organizationDetailsDTO = organisationService.createOrganization(ownerId, request);
     return ResponseEntity.status(HttpStatus.CREATED)

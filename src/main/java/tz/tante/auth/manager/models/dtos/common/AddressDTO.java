@@ -5,20 +5,23 @@ import jakarta.validation.constraints.NotBlank;
 
 @Schema(description = "Address details")
 public record AddressDTO(
-  @NotBlank(message = "Street is required")
-  String street,
+  long postalCode,
 
-  @NotBlank(message = "Area is required")
-  String area,
+  long streetNumber,
+
+  @NotBlank(message = "Street name is required")
+  String streetName,
+
+  @NotBlank(message = "Ward is required")
+  String ward,
 
   @NotBlank(message = "City is required")
   String city,
 
-  @NotBlank(message = "Region is Required")
+  @NotBlank(message = "Region is required")
   String region,
 
   @NotBlank(message = "Country is required")
-  String country
-)
+  String country)
 {
 }
