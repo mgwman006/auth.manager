@@ -36,3 +36,5 @@ app:
     exposed-headers: Authorization
     allow-credentials: true
 
+notification-manager:
+  base-url: ${RENT_MANAGER_BASE_URL:http://localhost:8083/rent-manager}
