@@ -51,10 +51,11 @@ public class UserService {
               (
                 membership.getId(),
                 membership.getUser() == null ? null:membership.getUser().getId(),
+                membership.getUser() == null ? null:membership.getUser().getFirstName(),
+                membership.getUser() == null ? null:membership.getUser().getLastName(),
                 membership.getOrganization() == null ? null:membership.getOrganization().getId(),
                 membership.getOrganization() == null ? null:membership.getOrganization().getName(),
-                membership.getOrganizationMembershipRole() == null ? null:membership.getOrganizationMembershipRole(),
-                membership.getStatus()
+                membership.getOrganizationMembershipRole() == null ? null:membership.getOrganizationMembershipRole()
               )
           )
           .toList()

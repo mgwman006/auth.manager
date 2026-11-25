@@ -22,7 +22,7 @@ public class GlobalExceptionHandler {
   public ResponseEntity<ApiResponse<Object>> handleInvalidRequest(HttpMessageNotReadableException exception)
   {
     return ResponseEntity.badRequest()
-      .body(ApiResponse.failure("VALIDATION_FAILED", "Invalid membership request or role.", HttpStatus.BAD_REQUEST.value()));
+      .body(ApiResponse.failure("VALIDATION_FAILED", "Invalid request or role.", HttpStatus.BAD_REQUEST.value()));
   }
 
   @ExceptionHandler(AccessDeniedException.class)
