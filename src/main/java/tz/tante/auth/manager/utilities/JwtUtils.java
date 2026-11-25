@@ -1,6 +1,7 @@
 
 package tz.tante.auth.manager.utilities;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.util.Set;
 
@@ -36,6 +37,21 @@ public class JwtUtils {
       .issuedAt(now)
       .expiresAt(now.plusMillis(Constant.jwtExpirationMs))
       .claim("roles", roles)
+      .build();
+
+    return jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
+  }
+
+  public String generateServiceToken(String serviceName, String scope, Duration ttl)
+  {
+    Instant now = Instant.now();
+
+    JwtClaimsSet claims = JwtClaimsSet.builder()
+      .issuer(appUrl)
+      .subject(serviceName)
+      .issuedAt(now)
+      .expiresAt(now.plus(ttl))
+      .claim("scope", scope)
       .build();
 
     return jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
