@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 import tz.tante.auth.manager.clients.NotificationManagerClient;
 import tz.tante.auth.manager.enums.MembershipStatus;
 import tz.tante.auth.manager.enums.OrganizationMembershipRole;
-import tz.tante.auth.manager.exceptions.MembershipAlreadyExistsException;
+import tz.tante.auth.manager.exceptions.ResourceExistException;
 import tz.tante.auth.manager.exceptions.ResourceNotFoundException;
 import tz.tante.auth.manager.exceptions.TanteException;
 import tz.tante.auth.manager.models.dtos.requests.memberships.MembershipCreateRequestDTO;
@@ -60,7 +60,7 @@ public class MembershipService
     Optional<Membership> existing = membershipRepository.findFirstByOrganizationIdAndInvitedPhoneNumberOrderByIdDesc(organizationId, invitedPhone);
     if (existing.isPresent() && BLOCKING_STATUSES.contains(existing.get().getStatus()))
     {
-      throw new MembershipAlreadyExistsException("This phone number is already a member or has a pending invitation in the organisation.");
+      throw new ResourceExistException("This phone number is already a member or has a pending invitation in the organisation.");
     }
 
     // Reuse an inactive/declined row so re-inviting does not accumulate duplicate memberships.
@@ -118,14 +118,69 @@ public class MembershipService
       .toList();
   }
 
+  @Transactional
+  public List<MembershipDetailsDTO> getOrganisationMembers(Long organizationId)
+  {
+    if (!membershipRepository.existsByOrganizationIdAndStatus(organizationId, MembershipStatus.ACTIVE))
+    {
+      throw new AccessDeniedException("Only active organisation members can view the member list.");
+    }
+
+    return membershipRepository.findByOrganizationIdAndStatusOrderByIdAsc(organizationId, MembershipStatus.ACTIVE)
+      .stream()
+      .map(this::mapMembershipToMembershipDetailsDTO)
+      .toList();
+  }
+
+
+  private Membership getPendingInvitationForPhone(Long membershipId, String actorPhone)
+  {
+    Membership membership = membershipRepository.findById(membershipId)
+      .orElseThrow(() -> new ResourceNotFoundException("Invitation not found."));
+
+    if (!Objects.equals(membership.getInvitedPhoneNumber(), Utils.normalizePhone(actorPhone)))
+    {
+      throw new AccessDeniedException("Only the invited user can respond to this invitation.");
+    }
+
+    if (membership.getStatus() != MembershipStatus.PENDING_INVITATION)
+    {
+      throw new TanteException("This invitation is no longer pending.");
+    }
+
+    return membership;
+  }
+
+  private NotificationRequest buildInvitationNotification(Organization organization, String invitedPhone, Membership membership)
+  {
+    String message = "You have been invited to join %s as %s. Create your account to accept or decline the invitation."
+      .formatted(organization.getName(), membership.getOrganizationMembershipRole());
+
+    String email = accountRepository.findByPhoneNumber(invitedPhone)
+      .map(Account::getEmail)
+      .orElse(null);
+
+    return new NotificationRequest(
+      "Organisation invitation",
+      message,
+      "SMS",
+      invitedPhone,
+      email,
+      "MEMBERSHIP",
+      String.valueOf(membership.getId())
+    );
+  }
+
   private MembershipDetailsDTO mapMembershipToMembershipDetailsDTO(Membership membership)
   {
     return new MembershipDetailsDTO(
       membership.getId(),
-      membership.getUser().getId(),
+      membership.getUser() == null ? null : membership.getUser().getId(),
       membership.getOrganization().getId(),
       membership.getOrganization().getName(),
-      membership.getOrganizationMembershipRole()
+      membership.getOrganizationMembershipRole(),
+      membership.getStatus()
     );
   }
 }
+
