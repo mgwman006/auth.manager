@@ -1,6 +1,7 @@
 package tz.tante.auth.manager.models.dtos.responses.memberships;
 
 
+import tz.tante.auth.manager.enums.MembershipStatus;
 import tz.tante.auth.manager.enums.OrganizationMembershipRole;
 
 public record MembershipDetailsDTO(
@@ -8,7 +9,8 @@ public record MembershipDetailsDTO(
   Long userId,
   Long organizationId,
   String organizationName,
-  OrganizationMembershipRole membershipRole
+  OrganizationMembershipRole membershipRole,
+  MembershipStatus status
 )
 {
 }
