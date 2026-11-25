@@ -4,7 +4,7 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import tz.tante.auth.manager.configs.feign.NotificationManagerFeignConfig;
-import tz.tante.auth.manager.models.dtos.requests.notifications.RentNotificationRequest;
+import tz.tante.auth.manager.models.dtos.requests.notifications.NotificationRequest;
 
 @FeignClient(
   name = "notification-manager",
@@ -14,6 +14,6 @@ import tz.tante.auth.manager.models.dtos.requests.notifications.RentNotification
 public interface NotificationManagerClient
 {
   @PostMapping("/v1/notifications")
-  void createNotification(@RequestBody RentNotificationRequest request);
+  void createNotification(@RequestBody NotificationRequest request);
 }
 
