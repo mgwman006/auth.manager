@@ -42,4 +42,36 @@ public class MembershipController
     return ResponseEntity.status(200)
       .body(ApiResponse.success(memberships, 200));
   }
+
+  @GetMapping("/organisations/{organizationId}")
+  public ResponseEntity<ApiResponse<List<MembershipDetailsDTO>>> getOrganisationMembers(@PathVariable Long organizationId)
+  {
+    List<MembershipDetailsDTO> memberships = membershipService.getOrganisationMembers(organizationId);
+    return ResponseEntity.status(HttpStatus.OK)
+      .body(ApiResponse.success(memberships, HttpStatus.OK.value()));
+  }
+
+  @GetMapping("/invitations/pending")
+  public ResponseEntity<ApiResponse<List<MembershipDetailsDTO>>> getPendingInvitations(Principal principal)
+  {
+    List<MembershipDetailsDTO> invitations = membershipService.getPendingInvitations(principal.getName());
+    return ResponseEntity.status(HttpStatus.OK)
+      .body(ApiResponse.success(invitations, HttpStatus.OK.value()));
+  }
+
+  @PostMapping("/{membershipId}/accept")
+  public ResponseEntity<ApiResponse<MembershipDetailsDTO>> acceptInvitation(@PathVariable Long membershipId, Principal principal)
+  {
+    MembershipDetailsDTO membership = membershipService.acceptInvitation(membershipId, principal.getName());
+    return ResponseEntity.status(HttpStatus.OK)
+      .body(ApiResponse.success(membership, HttpStatus.OK.value()));
+  }
+
+  @PostMapping("/{membershipId}/decline")
+  public ResponseEntity<ApiResponse<Void>> declineInvitation(@PathVariable Long membershipId, Principal principal)
+  {
+    membershipService.declineInvitation(membershipId, principal.getName());
+    return ResponseEntity.status(HttpStatus.OK)
+      .body(ApiResponse.success(null, HttpStatus.OK.value()));
+  }
 }
