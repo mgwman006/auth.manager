@@ -16,7 +16,7 @@ public class Membership extends BaseEntity
   private User user;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(nullable = false)
+  @JoinColumn(name = "organisation_id", nullable = false)
   private Organization organization;
 
   @Enumerated(EnumType.STRING)
