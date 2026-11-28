@@ -8,7 +8,7 @@ import tz.tante.auth.manager.models.dtos.requests.notifications.NotificationRequ
 
 @FeignClient(
   name = "notification-manager",
-  url = "${notification-manager.base-url}",
+  url = "${tante.notification.manager.base.url}",
   configuration = NotificationManagerFeignConfig.class
 )
 public interface NotificationManagerClient
