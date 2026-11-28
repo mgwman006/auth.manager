@@ -30,10 +30,10 @@ public class Organization extends BaseEntity
   @OneToMany(mappedBy = "organization", fetch = FetchType.LAZY)
   private Set<Membership> memberships = new HashSet<>();
 
-  public Organization(String name, String s, Address address, OrganizationType type)
+  public Organization(String name, String businessEmail, Address address, OrganizationType type)
   {
     this.name = name;
-    this.businessEmail = s;
+    this.businessEmail = businessEmail;
     this.address = address;
     this.type = type;
   }

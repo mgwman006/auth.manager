@@ -11,16 +11,18 @@ import tz.tante.auth.manager.enums.OrganizationMembershipRole;
 @Table(name = "organisation_memberships")
 public class Membership extends BaseEntity
 {
-  @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-  @JoinColumn(name = "user_id", nullable = false)
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(nullable = false)
   private User user;
 
-  @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+  @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "organisation_id", nullable = false)
   private Organization organization;
 
   @Enumerated(EnumType.STRING)
+  @Column(nullable = false, length = 30)
   private OrganizationMembershipRole organizationMembershipRole;
 
-  private boolean active = true;
+  @Column(nullable = false, columnDefinition = "boolean default false")
+  private boolean isActive = false;
 }

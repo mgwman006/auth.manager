@@ -2,6 +2,7 @@ package tz.tante.auth.manager.controllers;
 
 import lombok.AllArgsConstructor;
 import lombok.Setter;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,7 +26,16 @@ public class MembershipController
   public ResponseEntity<ApiResponse<List<MembershipDetailsDTO>>> getMembershipsByUserId(@PathVariable Long userId)
   {
     List<MembershipDetailsDTO> memberships = membershipService.getMembershipsByUserId(userId);
-    return ResponseEntity.status(200)
-      .body(ApiResponse.success(memberships, 200));
+    return ResponseEntity.status(HttpStatus.OK)
+      .body(ApiResponse.success(memberships, HttpStatus.OK.value()));
+  }
+
+  @GetMapping("/organisations/{organizationId}")
+  public ResponseEntity<ApiResponse<List<MembershipDetailsDTO>>> getOrganisationMembers(@PathVariable Long organizationId)
+  {
+    List<MembershipDetailsDTO> memberships = membershipService.getOrganisationMembers(organizationId);
+    return ResponseEntity.status(HttpStatus.OK)
+      .body(ApiResponse.success(memberships, HttpStatus.OK.value()));
   }
 }
+
