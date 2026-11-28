@@ -15,6 +15,7 @@ jobs:
       DB_USERNAME: ${{ secrets.AUTH_MANAGER_DB_USERNAME}}
       DB_PASSWORD: ${{ secrets.AUTH_MANAGER_DB_PASSWORD }}
       APP_URL: ${{ secrets.APP_URL }}
+      USER_MANAGER_UI_BASE_URL: ${{ secrets.USER_MANAGER_UI_BASE_URL }}
       SERVER_PORT: 8081
 
     steps:
@@ -53,6 +54,7 @@ jobs:
            DB_USERNAME='${{ secrets.AUTH_MANAGER_DB_USERNAME }}' \
            DB_PASSWORD='${{ secrets.AUTH_MANAGER_DB_PASSWORD }}' \
            APP_URL='${{ secrets.APP_URL }}' \
+           USER_MANAGER_UI_BASE_URL='${{ secrets.USER_MANAGER_UI_BASE_URL }}' \
            bash -s" << 'EOF'
 
           set -e
@@ -75,6 +77,7 @@ jobs:
             -e DB_USERNAME="$DB_USERNAME" \
             -e DB_PASSWORD="$DB_PASSWORD" \
             -e APP_URL="$APP_URL" \
+            -e USER_MANAGER_UI_BASE_URL="$USER_MANAGER_UI_BASE_URL" \
             auth-manager:dev
 
           EOF

@@ -22,4 +22,7 @@ public class Membership extends BaseEntity
   @Enumerated(EnumType.STRING)
   @Column(nullable = false, length = 30)
   private OrganizationMembershipRole organizationMembershipRole;
+
+  @Column(nullable = false, columnDefinition = "boolean default false")
+  private boolean isActive = false;
 }

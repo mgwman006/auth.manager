@@ -2,7 +2,7 @@ package tz.tante.auth.manager.services;
 
 
 import jakarta.transaction.Transactional;
-import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import tz.tante.auth.manager.clients.NotificationManagerClient;
@@ -29,7 +29,6 @@ import java.util.List;
 import java.util.Objects;
 
 @Service
-@AllArgsConstructor
 public class OrganizationInvitationService
 {
   private static final List<OrganizationMembershipRole> INVITER_ROLES =
@@ -42,6 +41,28 @@ public class OrganizationInvitationService
   private final AccountRepository accountRepository;
   private final MembershipService membershipService;
   private final NotificationManagerClient notificationManagerClient;
+  private final String userUiBaseUrl;
+
+  public OrganizationInvitationService(
+    OrganizationInvitationRepository invitationRepository,
+    OrganizationRepository organizationRepository,
+    MembershipRepository membershipRepository,
+    UserRepository userRepository,
+    AccountRepository accountRepository,
+    MembershipService membershipService,
+    NotificationManagerClient notificationManagerClient,
+    @Value("${tante.user.manager.ui.base.url}")
+    String userUiBaseUrl)
+  {
+    this.invitationRepository = invitationRepository;
+    this.organizationRepository = organizationRepository;
+    this.membershipRepository = membershipRepository;
+    this.userRepository = userRepository;
+    this.accountRepository = accountRepository;
+    this.membershipService = membershipService;
+    this.notificationManagerClient = notificationManagerClient;
+    this.userUiBaseUrl = userUiBaseUrl;
+  }
 
   @Transactional
   public InvitationDetailsDTO createInvitation(Long organizationId, InvitationCreateRequestDTO request)
@@ -144,8 +165,10 @@ public class OrganizationInvitationService
 
   private NotificationRequest buildInvitationNotification(Organization organization, String invitedPhone, OrganizationInvitation invitation)
   {
-    String message = "You have been invited to join %s as %s. Create your account to accept or decline the invitation."
-      .formatted(organization.getName(), invitation.getOrganizationMembershipRole());
+    String invitationsUrl =userUiBaseUrl+ "/invitations";
+    String message = ("You have been invited to join %s as %s. "
+      + "Click the link to view and accept or decline your invitation: %s")
+      .formatted(organization.getName(), invitation.getOrganizationMembershipRole(), invitationsUrl);
 
     String email = accountRepository.findByPhoneNumber(invitedPhone)
       .map(Account::getEmail)
