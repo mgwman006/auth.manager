@@ -4,7 +4,9 @@ import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -16,6 +18,19 @@ import java.util.Map;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+  @ExceptionHandler(HttpMessageNotReadableException.class)
+  public ResponseEntity<ApiResponse<Object>> handleInvalidRequest(HttpMessageNotReadableException exception)
+  {
+    return ResponseEntity.badRequest()
+      .body(ApiResponse.failure("VALIDATION_FAILED", "Invalid request or role.", HttpStatus.BAD_REQUEST.value()));
+  }
+
+  @ExceptionHandler(AccessDeniedException.class)
+  public ResponseEntity<ApiResponse<Object>> handleAccessDenied(AccessDeniedException exception)
+  {
+    return ResponseEntity.status(HttpStatus.FORBIDDEN)
+      .body(ApiResponse.failure("FORBIDDEN", exception.getMessage(), HttpStatus.FORBIDDEN.value()));
+  }
 
   @ExceptionHandler(AuthException.class)
   public ResponseEntity<ApiResponse<Object>> handleAuthentication(AuthException exception)

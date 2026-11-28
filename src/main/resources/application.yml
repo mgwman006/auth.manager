@@ -36,3 +36,14 @@ app:
     exposed-headers: Authorization
     allow-credentials: true
 
+# User manager UI (used for links in notifications)
+tante:
+  notification:
+    manager:
+      base:
+        url: ${NOTIFICATION_MANAGER_BASE_URL:http://localhost:8083}/rent-manager
+  user:
+    manager:
+      ui:
+        base:
+          url: ${USER_MANAGER_UI_BASE_URL:http://localhost:4177}
